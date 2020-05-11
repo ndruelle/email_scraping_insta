@@ -14,7 +14,7 @@ with open('settings.json','r') as settings:
 chromedriver_path = '/usr/local/bin/chromedriver'
 webdriver = webdriver.Chrome(chromedriver_path)
 
-'''
+
 def login():
     #Open the instagram login page
     webdriver.get ('https://www.instagram.com/accounts/login/?source=auth_switcher')
@@ -52,7 +52,7 @@ def get_username():
 
     selected_user = []
     print(selected_user)
-'''
+
     for hashtag in hashtags :
         for x in range(0,10):
             webdriver.get('https://www.instagram.com/explore/tags/' + hashtag + '/')
@@ -85,8 +85,7 @@ def get_data(username_insta, password_insta, selected_users):
     for user in selected_users:
         account = instagram.get_account(user)
 
-'''
 
-#login()
+login()
 get_username()
-#get_data(username_insta, password_insta)
+get_data(username_insta, password_insta)
