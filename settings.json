@@ -7,5 +7,13 @@
     "hashtags": [
       "yoga"
     ]
+  },
+  "db": {
+    "host": "localhost",
+    "user": "root",
+    "pass": "druelleesG76",
+    "database": "instabot",
+    "auth_plugin": "caching_sha2_password",
+    "port": "3306"
   }
 }

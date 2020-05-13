@@ -3,6 +3,8 @@ import json
 from selenium import webdriver
 import random
 from igramscraper.instagram import Instagram
+import pandas as pd
+import DBusers
 
 
 with open('settings.json','r') as settings:
@@ -15,6 +17,25 @@ chromedriver_path = '/usr/local/bin/chromedriver'
 webdriver = webdriver.Chrome(chromedriver_path)
 
 selected_user = []
+
+data = {'id': [],
+            'Username': [],
+            'Full name': [],
+            'Biography': [],
+            'Profile pic url': [],
+            'External Url': [],
+            'Number of followers': [],
+            'Number of follows': [],
+            'Is private': [],
+            'Is verified': [],
+            'Number of published posts': [],
+            'Business address': [],
+            'Business email': [],
+            'Business category': [],
+            'Business phone number': [],
+            'Joined recently': [],
+            'Is Business Account': []
+            }
 
 def login():
     #Open the instagram login page
@@ -63,7 +84,7 @@ def get_username():
         first_thumbnail.click ()
         sleep (random.randint (1, 3))
 
-        for x in range (1,3):
+        for x in range (0,5):
 
 
             try:
@@ -71,38 +92,20 @@ def get_username():
             except:
                 username = webdriver.find_element_by_xpath('/html/body/div[4]/div[2]/div/article/header/div[2]/div[1]/div[1]/a').text
 
+
+            DBusers.add_user(username)
             selected_user.append(username)
 
             webdriver.find_element_by_link_text ('Next').click ()
             sleep (random.randint (2, 4))
 
-        print(selected_user)
-
+    print(selected_user)
 
 def get_data(username_insta, password_insta):
     users = selected_user
     instagram = Instagram()
     instagram.with_credentials (username_insta, password_insta, 'chache')
     instagram.login ()
-
-    data = {'id': [],
-            'Username': [],
-            'Full name': [],
-            'Biography': [],
-            'Profile pic url': [],
-            'External Url': [],
-            'Number of followers': [],
-            'Number of follows': [],
-            'Is private': [],
-            'Is verified': [],
-            'Number of published posts': [],
-            'Business address': [],
-            'Business email': [],
-            'Business category': [],
-            'Business phone number': [],
-            'Joined recently': [],
-            'Is Business Account': []
-            }
 
     for user in users:
         account = instagram.get_account (user)
@@ -130,3 +133,6 @@ def get_data(username_insta, password_insta):
 login()
 get_username()
 get_data(username_insta, password_insta)
+df = pd.DataFrame(data)
+print(df)
+
