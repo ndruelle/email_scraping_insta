@@ -3,7 +3,6 @@ import json
 from selenium import webdriver
 import random
 from igramscraper.instagram import Instagram
-import pandas as pd
 import DBusers
 
 
@@ -13,11 +12,7 @@ with open('settings.json','r') as settings:
     password_insta = credentials['instagram']['pass']
     hashtags = credentials['config']['hashtags']
 
-chromedriver_path = '/usr/local/bin/chromedriver'
-webdriver = webdriver.Chrome(chromedriver_path)
-
-selected_user = []
-
+'''
 data = {'id': [],
             'Username': [],
             'Full name': [],
@@ -36,8 +31,15 @@ data = {'id': [],
             'Joined recently': [],
             'Is Business Account': []
             }
+'''
 
 def login():
+
+    # fetch webriver path
+    chromedriver_path = '/usr/local/bin/chromedriver'
+    global webdriver
+    webdriver = webdriver.Chrome (chromedriver_path)
+
     #Open the instagram login page
     webdriver.get ('https://www.instagram.com/accounts/login/?source=auth_switcher')
     #sleep for 3 seconds to prevent issues with the server
@@ -63,16 +65,19 @@ def login():
     button_login.click()
     sleep(3)
 
-    try:
-        notnow = webdriver.find_element_by_css_selector (
+    notnow = webdriver.find_element_by_css_selector (
             'body > div.RnEpo.Yx5HN > div > div > div.mt3GC > button.aOOlW.HoLwm')
-        notnow.click ()
-    except:
-        return
+    notnow.click ()
 
 def get_username():
 
+    #looping through the list of hastag in setting.json
     for hashtag in hashtags :
+
+        #checking if username has alredy been scraped
+        prev_user_list = DBusers.get_username()
+
+        #html request on hastag in list
 
         webdriver.get ('https://www.instagram.com/explore/tags/' + hashtag + '/')
         sleep (5)
@@ -84,31 +89,41 @@ def get_username():
         first_thumbnail.click ()
         sleep (random.randint (1, 3))
 
+        #define the number of picture to scrape in this range
         for x in range (0,5):
-
 
             try:
                 username = webdriver.find_element_by_xpath ('/html/body/div[4]/div[2]/div/article/header/div[2]/div[1]/div[1]').text
             except:
                 username = webdriver.find_element_by_xpath('/html/body/div[4]/div[2]/div/article/header/div[2]/div[1]/div[1]/a').text
 
-
-            DBusers.add_user(username)
-            selected_user.append(username)
+            # if user already exist, click next to move on otherwise log username to db
+            if username not in prev_user_list:
+                data_scrapped = False
+                DBusers.add_username(username,hashtag,data_scrapped)
+            else:
+                continue
 
             webdriver.find_element_by_link_text ('Next').click ()
             sleep (random.randint (2, 4))
 
-    print(selected_user)
-
 def get_data(username_insta, password_insta):
-    users = selected_user
+
+    #get username from db that haven't been scrapped before
+    #users = DBusers.get_username_to_scrapped
+    users = ['ndruelle','marie']
+
+    #Instantiate Instagram class from igramscraper.instagram package
     instagram = Instagram()
-    instagram.with_credentials (username_insta, password_insta, 'chache')
-    instagram.login ()
+    instagram.with_credentials(username_insta, password_insta, 'chache')
+    instagram.login()
 
     for user in users:
-        account = instagram.get_account (user)
+        account = instagram.get_account(user)
+        id = account.identifier
+        print (id)
+
+'''
         data['id'].append (account.identifier)
         data['Username'].append (account.username)
         data['Full name'].append (account.full_name)
@@ -126,13 +141,14 @@ def get_data(username_insta, password_insta):
         data['Business phone number'].append (account.business_phone_number)
         data['Joined recently'].append (account.is_joined_recently)
         data['Is Business Account'].append (account.is_business_account)
+'''
 
-    print(data)
 
 
-login()
-get_username()
-get_data(username_insta, password_insta)
-df = pd.DataFrame(data)
-print(df)
+
+#login()
+#get_username()
+#get_data(username_insta, password_insta)
+#df = pd.DataFrame(data)
+#print(df)
 
