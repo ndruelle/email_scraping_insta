@@ -36,13 +36,15 @@ data = {'id': [],
 def login():
 
     # fetch webriver path
-    chromedriver_path = '/usr/local/bin/chromedriver'
+    chromedriver_path = '/Users/nicolasdruelle/PycharmProjects/email_scraping_insta/chromedriver'
     global webdriver
     webdriver = webdriver.Chrome (chromedriver_path)
 
     #Open the instagram login page
     webdriver.get ('https://www.instagram.com/accounts/login/?source=auth_switcher')
     #sleep for 3 seconds to prevent issues with the server
+
+
     sleep(3)
     #Find username and password fields and set their input using our constants
 
@@ -64,6 +66,13 @@ def login():
     #click login
     button_login.click()
     sleep(3)
+
+    saved_password = webdriver.find_element_by_xpath(
+        '//*[@id="react-root"]/section/main/div/div/div/section/div/button')
+
+    saved_password.click()
+
+    sleep(1)
 
     notnow = webdriver.find_element_by_css_selector (
             'body > div.RnEpo.Yx5HN > div > div > div.mt3GC > button.aOOlW.HoLwm')
@@ -146,8 +155,8 @@ def get_data(username_insta, password_insta):
 
 
 
-#login()
-#get_username()
+login()
+get_username()
 #get_data(username_insta, password_insta)
 #df = pd.DataFrame(data)
 #print(df)
