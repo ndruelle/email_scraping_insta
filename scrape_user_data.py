@@ -99,7 +99,7 @@ def get_username():
         sleep (random.randint (1, 3))
 
         #define the number of picture to scrape in this range
-        for x in range (0,5):
+        for x in range (0,500):
 
             try:
                 username = webdriver.find_element_by_xpath ('/html/body/div[4]/div[2]/div/article/header/div[2]/div[1]/div[1]').text
@@ -120,7 +120,7 @@ def get_data(username_insta, password_insta):
 
     #get username from db that haven't been scrapped before
     #users = DBusers.get_username_to_scrapped
-    users = ['ndruelle','marie']
+    users = ['ndruelle','marie','snehzala']
 
     #Instantiate Instagram class from igramscraper.instagram package
     instagram = Instagram()
@@ -130,34 +130,22 @@ def get_data(username_insta, password_insta):
     for user in users:
         account = instagram.get_account(user)
         id = account.identifier
-        print (id)
+        username = account.username
+        full_name = account.full_name
+        biography = account.biography
+        nbr_followers = account.followed_by_count
+        nbr_follows = account.follows_count
+        business_address = account.business_address_json
+        business_email = account.business_email
+        business_phone_number = account.business_phone_number
 
-'''
-        data['id'].append (account.identifier)
-        data['Username'].append (account.username)
-        data['Full name'].append (account.full_name)
-        data['Biography'].append (account.biography)
-        data['Profile pic url'].append (account.profile_pic_url)
-        data['External Url'].append (account.external_url)
-        data['Number of followers'].append (account.followed_by_count)
-        data['Number of follows'].append (account.follows_count)
-        data['Is private'].append (account.is_private)
-        data['Is verified'].append (account.is_verified)
-        data['Number of published posts'].append (account.media_count)
-        data['Business address'].append (account.business_address_json)
-        data['Business email'].append (account.business_email)
-        data['Business category'].append (account.business_category_name)
-        data['Business phone number'].append (account.business_phone_number)
-        data['Joined recently'].append (account.is_joined_recently)
-        data['Is Business Account'].append (account.is_business_account)
-'''
+        DBusers.add_scrapped_data(id,username,full_name,biography,nbr_followers,nbr_follows,business_address,business_email,business_phone_number)
+        DBusers.update_user_scrapped(username)
 
 
 
+#login()
+#get_username()
+get_data(username_insta, password_insta)
 
-login()
-get_username()
-#get_data(username_insta, password_insta)
-#df = pd.DataFrame(data)
-#print(df)
 
